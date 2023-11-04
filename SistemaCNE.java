@@ -7,7 +7,6 @@ public class SistemaCNE {
     ColaDePrioridad[] dHondt;
     ColaDePrioridad ballotage;
 
-
     public class Partido {
         private int votos_totales;
         private String nombre;
@@ -18,19 +17,56 @@ public class SistemaCNE {
         private int max;
         private int min;
         private String nombre;
-        private int[] votos_partido;
+        private int[] votos_partidos;
     }
 
-    public class VotosPartido{
+    public class VotosPartido {
         private int presidente;
         private int diputados;
-        VotosPartido(int presidente, int diputados){this.presidente = presidente; this.diputados = diputados;}
-        public int votosPresidente(){return presidente;}
-        public int votosDiputados(){return diputados;}
+
+        VotosPartido(int presidente, int diputados) {
+            this.presidente = presidente;
+            this.diputados = diputados;
+        }
+
+        public int votosPresidente() {
+            return presidente;
+        }
+
+        public int votosDiputados() {
+            return diputados;
+        }
     }
 
-    public SistemaCNE(String[] nombresDistritos, int[] diputadosPorDistrito, String[] nombresPartidos, int[] ultimasMesasDistritos) {
-        throw new UnsupportedOperationException("No implementada aun");
+    public SistemaCNE(String[] nombresDistritos, int[] diputadosPorDistrito, String[] nombresPartidos,
+            int[] ultimasMesasDistritos) {
+        partidos = new Partido[nombresPartidos.length];
+        distritos = new Distrito[nombresDistritos.length];
+        dHondt = new ColaDePrioridad[nombresDistritos.length];
+        ballotage = new ColaDePrioridad(nombresPartidos.length);
+        votos_totales = 0;
+
+        for (int dist = 0; dist < distritos.length; dist++) {
+            Distrito distrito = new Distrito();
+            distrito.cant_bancas = diputadosPorDistrito[dist];
+            distrito.nombre = nombresDistritos[dist];
+            distrito.max = ultimasMesasDistritos[dist];
+            distrito.min = (dist == 0) ? 0 : (distritos[dist - 1].max + 1);
+            distrito.votos_partidos = new int[nombresDistritos.length];
+            for (int part = 0; part < nombresPartidos.length; part++) {
+                distrito.votos_partidos[part] = 0;
+            }
+            distritos[dist] = distrito;
+
+        }
+
+        for (int part = 0; part < partidos.length; part++) {
+            Partido partido = new Partido();
+            partido.nombre = nombresPartidos[part];
+            partido.votos_totales = 0;
+            partidos[part] = partido;
+        }
+
     }
 
     public String nombrePartido(int idPartido) {
@@ -61,12 +97,11 @@ public class SistemaCNE {
         throw new UnsupportedOperationException("No implementada aun");
     }
 
-    public int[] resultadosDiputados(int idDistrito){
+    public int[] resultadosDiputados(int idDistrito) {
         throw new UnsupportedOperationException("No implementada aun");
     }
 
-    public boolean hayBallotage(){
+    public boolean hayBallotage() {
         throw new UnsupportedOperationException("No implementada aun");
     }
 }
-

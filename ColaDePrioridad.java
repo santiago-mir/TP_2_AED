@@ -2,17 +2,21 @@ package aed;
 
 public class ColaDePrioridad { // max heap
     int[] elems;
+    int longitud;
 
     public static void main(String[] args) {
-        int[] hola = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53 };
+        int[] hola = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53, 92, 10 };
         ColaDePrioridad pepe = new ColaDePrioridad(hola);
         pepe.print();
-        pepe.desencolar();
+        int max = pepe.desencolar();
+        pepe.print();
+        pepe.encolar(max);
         pepe.print();
     }
 
     public ColaDePrioridad(int longitud) {
         elems = new int[longitud];
+        this.longitud = longitud;
     }
 
     public ColaDePrioridad(int[] arreglo) {
@@ -21,16 +25,33 @@ public class ColaDePrioridad { // max heap
             heapify(arreglo, i);
         }
         elems = arreglo;
+        longitud = arreglo.length;
     }
 
     public int desencolar() {
         int maximo = elems[0];
         int ultimo = elems[elems.length - 1];
         elems[0] = ultimo;
-        elems[elems.length - 1] = 0;
+        elems[elems.length - 1] = -1;
+        longitud--;
         heapify(elems, 0);
 
         return maximo;
+    }
+
+    public int proximo() {
+        return elems[0];
+    }
+
+    public void encolar(int e) {
+        int i = elems.length - 1;
+        elems[elems.length - 1] = e;
+        while (elems[i] > elems[(i - 1) / 2]) {
+            elems[i] = elems[(i - 1) / 2];
+            elems[(i - 1) / 2] = e;
+            i = (i - 1) / 2;
+        }
+        longitud++;
     }
 
     public void print() {
@@ -53,7 +74,9 @@ public class ColaDePrioridad { // max heap
                 for (int espacio = 0; espacio < max_long / (i + 1.2); espacio++) {
                     linea += "  ";
                 }
-                linea += elems[(int) Math.pow(2, i) + j - 1];
+                if ((int) Math.pow(2, i) + j - 1 < elems.length) {
+                    linea += elems[(int) Math.pow(2, i) + j - 1];
+                }
             }
             System.out.println(linea);
             linea = "";

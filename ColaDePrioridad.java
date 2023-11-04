@@ -1,6 +1,6 @@
 package aed;
 
-public class ColaDePrioridad { // max heap
+public class ColaDePrioridad { // max heap. Para complejidades n=longitud. Si no se aclara es O(1)
     int[] elems;
     int longitud;
 
@@ -14,40 +14,42 @@ public class ColaDePrioridad { // max heap
         pepe.print();
     }
 
-    public ColaDePrioridad(int longitud) {
+    public ColaDePrioridad(int longitud) { // O(1)
         elems = new int[longitud];
         this.longitud = longitud;
     }
 
-    public ColaDePrioridad(int[] arreglo) {
+    public ColaDePrioridad(int[] arreglo) { // O(n)
         longitud = arreglo.length;
         // elems = new int[arreglo.length];
-        for (int i = arreglo.length - 1; i >= 0; i--) {
-            heapify(arreglo, i, longitud);
+        for (int i = arreglo.length - 1; i >= 0; i--) { // O(n) por lo visto en clase
+            heapify(arreglo, i, longitud); // O( log(n) - altura(i) )
         }
         elems = arreglo;
     }
 
-    public int desencolar() { // requiere que longitud > 0 &&
+    // requiere que longitud > 0
+    public int desencolar() { // O(log n)
         int maximo = elems[0];
         int ultimo = elems[longitud - 1];
         elems[0] = ultimo;
         elems[longitud - 1] = -1;
         longitud--;
-        heapify(elems, 0, longitud);
+        heapify(elems, 0, longitud); // O(log n)
 
         return maximo;
     }
 
-    public int proximo() {
+    public int proximo() { // O(1)
         return elems[0];
     }
 
-    public void encolar(int e) { // requiere que longitud < elems.length
+    // requiere que longitud < elems.length
+    public void encolar(int e) { // O(log n)
         int i = longitud;
         elems[longitud] = e;
         longitud++;
-        while (elems[i] > elems[(i - 1) / 2]) {
+        while (elems[i] > elems[(i - 1) / 2]) { // O(log n), cada vez se reduce a la mitad
             elems[i] = elems[(i - 1) / 2];
             elems[(i - 1) / 2] = e;
             i = (i - 1) / 2;
@@ -84,7 +86,7 @@ public class ColaDePrioridad { // max heap
 
     }
 
-    private void heapify(int[] arr, int i, int max_long) {
+    private void heapify(int[] arr, int i, int max_long) { // O( log(max_long) - altura(i) )
         int hijoIzq = i * 2 + 1;
         int hijoDer = i * 2 + 2;
         boolean tieneHijoIzq = hijoIzq < max_long;
@@ -102,7 +104,7 @@ public class ColaDePrioridad { // max heap
                 int mayorHijoValor = arr[mayorHijo];
                 arr[mayorHijo] = arr[i];
                 arr[i] = mayorHijoValor;
-                heapify(arr, mayorHijo, max_long);
+                heapify(arr, mayorHijo, max_long); // O( log(max_long) - altura(mayorHijo) )
             }
         }
     }

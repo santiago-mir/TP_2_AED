@@ -58,6 +58,7 @@ public class SistemaCNE {
             }
             distritos[dist] = distrito;
 
+            dHondt[dist] = new ColaDePrioridad(nombresPartidos.length);
         }
 
         for (int part = 0; part < partidos.length; part++) {

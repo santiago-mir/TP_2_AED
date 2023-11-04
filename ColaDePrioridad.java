@@ -1,6 +1,6 @@
 package aed;
 
-public class ColaDePrioridad { // max heap.
+public class ColaDePrioridad { // Max Heap.
     int[] elems; // Para complejidades n = longitud. Se toma el peor caso.
     int longitud; // Si no se aclara se asume que es O(1).
 

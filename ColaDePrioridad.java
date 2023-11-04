@@ -1,17 +1,17 @@
 package aed;
 
-public class ColaDePrioridad { // max heap. Para complejidades n=longitud. Si no se aclara es O(1)
-    int[] elems;
-    int longitud;
+public class ColaDePrioridad { // max heap.
+    int[] elems; // Para complejidades n = longitud. Se toma el peor caso.
+    int longitud; // Si no se aclara se asume que es O(1).
 
     public static void main(String[] args) {
-        int[] hola = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53, 92, 10, -20 };
-        ColaDePrioridad pepe = new ColaDePrioridad(hola);
-        pepe.print();
-        int max = pepe.desencolar();
-        pepe.print();
-        pepe.encolar(max);
-        pepe.print();
+        int[] arr = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53, 92, 10, -20 };
+        ColaDePrioridad cola = new ColaDePrioridad(arr);
+        cola.print();
+        int max = cola.desencolar();
+        cola.print();
+        cola.encolar(max);
+        cola.print();
     }
 
     public ColaDePrioridad(int longitud) { // O(1)
@@ -22,8 +22,8 @@ public class ColaDePrioridad { // max heap. Para complejidades n=longitud. Si no
     public ColaDePrioridad(int[] arreglo) { // O(n)
         longitud = arreglo.length;
         // elems = new int[arreglo.length];
-        for (int i = arreglo.length - 1; i >= 0; i--) { // O(n) por lo visto en clase
-            heapify(arreglo, i, longitud); // O( log(n) - altura(i) )
+        for (int i = arreglo.length - 1; i >= 0; i--) { // O(n) por lo visto en clase del algoritmo de Floyd
+            heapify(arreglo, i, longitud); // O(log(n) - altura(i))
         }
         elems = arreglo;
     }
@@ -42,6 +42,19 @@ public class ColaDePrioridad { // max heap. Para complejidades n=longitud. Si no
 
     public int proximo() { // O(1)
         return elems[0];
+    }
+
+    // requiere longitud > 1
+    public int segundo() { // O(1)
+        if (longitud > 2) {
+            if (elems[1] > elems[2]) {
+                return elems[1];
+            } else {
+                return elems[2];
+            }
+        } else {
+            return elems[1];
+        }
     }
 
     // requiere que longitud < elems.length
@@ -86,7 +99,15 @@ public class ColaDePrioridad { // max heap. Para complejidades n=longitud. Si no
 
     }
 
-    private void heapify(int[] arr, int i, int max_long) { // O( log(max_long) - altura(i) )
+    // No sabemos calcular formalmente la complejidad de funciones recursivas, sin
+    // embargo
+    // va a haber a lo sumo (la altura del subárbol correspondiente a i)
+    // recursiones, y
+    // como solo incluye operaciones O(1) y su llamado recursivo, entonces podemos
+    // decir
+    // su cumplejidad es O(la altura del subárbol correspondiente a i) =
+    // O(log(max_long) - nivel(i))
+    private void heapify(int[] arr, int i, int max_long) { // O(log(max_long) - nivel(i))
         int hijoIzq = i * 2 + 1;
         int hijoDer = i * 2 + 2;
         boolean tieneHijoIzq = hijoIzq < max_long;
@@ -104,7 +125,7 @@ public class ColaDePrioridad { // max heap. Para complejidades n=longitud. Si no
                 int mayorHijoValor = arr[mayorHijo];
                 arr[mayorHijo] = arr[i];
                 arr[i] = mayorHijoValor;
-                heapify(arr, mayorHijo, max_long); // O( log(max_long) - altura(mayorHijo) )
+                heapify(arr, mayorHijo, max_long); // O(log(max_long) - nivel(i) - 1). Cada vez se va reduciendo u
             }
         }
     }

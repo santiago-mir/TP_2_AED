@@ -3,6 +3,14 @@ package aed;
 public class ColaDePrioridad { // max heap
     int[] elems;
 
+    public static void main(String[] args) {
+        int[] hola = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53 };
+        ColaDePrioridad pepe = new ColaDePrioridad(hola);
+        pepe.print();
+        pepe.desencolar();
+        pepe.print();
+    }
+
     public ColaDePrioridad(int longitud) {
         elems = new int[longitud];
     }
@@ -13,6 +21,16 @@ public class ColaDePrioridad { // max heap
             heapify(arreglo, i);
         }
         elems = arreglo;
+    }
+
+    public int desencolar() {
+        int maximo = elems[0];
+        int ultimo = elems[elems.length - 1];
+        elems[0] = ultimo;
+        elems[elems.length - 1] = 0;
+        heapify(elems, 0);
+
+        return maximo;
     }
 
     public void print() {
@@ -41,12 +59,6 @@ public class ColaDePrioridad { // max heap
             linea = "";
         }
 
-    }
-
-    public static void main(String[] args) {
-        int[] hola = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53 };
-        ColaDePrioridad pepe = new ColaDePrioridad(hola);
-        pepe.print();
     }
 
     private void heapify(int[] arr, int i) {

@@ -5,7 +5,7 @@ public class ColaDePrioridad { // max heap
     int longitud;
 
     public static void main(String[] args) {
-        int[] hola = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53, 92, 10 };
+        int[] hola = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53, 92, 10, -20 };
         ColaDePrioridad pepe = new ColaDePrioridad(hola);
         pepe.print();
         int max = pepe.desencolar();
@@ -20,21 +20,21 @@ public class ColaDePrioridad { // max heap
     }
 
     public ColaDePrioridad(int[] arreglo) {
+        longitud = arreglo.length;
         // elems = new int[arreglo.length];
         for (int i = arreglo.length - 1; i >= 0; i--) {
-            heapify(arreglo, i);
+            heapify(arreglo, i, longitud);
         }
         elems = arreglo;
-        longitud = arreglo.length;
     }
 
-    public int desencolar() {
+    public int desencolar() { // requiere que longitud > 0 &&
         int maximo = elems[0];
-        int ultimo = elems[elems.length - 1];
+        int ultimo = elems[longitud - 1];
         elems[0] = ultimo;
-        elems[elems.length - 1] = -1;
+        elems[longitud - 1] = -1;
         longitud--;
-        heapify(elems, 0);
+        heapify(elems, 0, longitud);
 
         return maximo;
     }
@@ -43,15 +43,15 @@ public class ColaDePrioridad { // max heap
         return elems[0];
     }
 
-    public void encolar(int e) {
-        int i = elems.length - 1;
-        elems[elems.length - 1] = e;
+    public void encolar(int e) { // requiere que longitud < elems.length
+        int i = longitud;
+        elems[longitud] = e;
+        longitud++;
         while (elems[i] > elems[(i - 1) / 2]) {
             elems[i] = elems[(i - 1) / 2];
             elems[(i - 1) / 2] = e;
             i = (i - 1) / 2;
         }
-        longitud++;
     }
 
     public void print() {
@@ -64,7 +64,7 @@ public class ColaDePrioridad { // max heap
 
         int max_long = 1;
         int altura = 1;
-        while (2 * max_long < elems.length) {
+        while (2 * max_long < longitud) {
             max_long = 2 * max_long;
             altura++;
         }
@@ -74,7 +74,7 @@ public class ColaDePrioridad { // max heap
                 for (int espacio = 0; espacio < max_long / (i + 1.2); espacio++) {
                     linea += "  ";
                 }
-                if ((int) Math.pow(2, i) + j - 1 < elems.length) {
+                if ((int) Math.pow(2, i) + j - 1 < longitud) {
                     linea += elems[(int) Math.pow(2, i) + j - 1];
                 }
             }
@@ -84,11 +84,11 @@ public class ColaDePrioridad { // max heap
 
     }
 
-    private void heapify(int[] arr, int i) {
+    private void heapify(int[] arr, int i, int max_long) {
         int hijoIzq = i * 2 + 1;
         int hijoDer = i * 2 + 2;
-        boolean tieneHijoIzq = hijoIzq < arr.length;
-        boolean tieneHijoDer = hijoDer < arr.length;
+        boolean tieneHijoIzq = hijoIzq < max_long;
+        boolean tieneHijoDer = hijoDer < max_long;
         boolean tieneHijos = tieneHijoDer || tieneHijoIzq;
 
         if (tieneHijos) {
@@ -102,7 +102,7 @@ public class ColaDePrioridad { // max heap
                 int mayorHijoValor = arr[mayorHijo];
                 arr[mayorHijo] = arr[i];
                 arr[i] = mayorHijoValor;
-                heapify(arr, mayorHijo);
+                heapify(arr, mayorHijo, max_long);
             }
         }
     }

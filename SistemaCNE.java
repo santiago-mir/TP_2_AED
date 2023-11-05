@@ -6,6 +6,7 @@ public class SistemaCNE {
     int votos_totales;
     ColaDePrioridad[] dHondt;
     ColaDePrioridad ballotage;
+    int prueba;
 
     public class Partido {
         private int votos_totales;

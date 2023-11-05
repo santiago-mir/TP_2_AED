@@ -82,15 +82,15 @@ public class SistemaCNE {
     }
 
     public String nombrePartido(int idPartido) {
-        throw new UnsupportedOperationException("No implementada aun");
+        return partidos[idPartido].nombre; // O(1)
     }
 
     public String nombreDistrito(int idDistrito) {
-        throw new UnsupportedOperationException("No implementada aun");
+        return distritos[idDistrito].nombre; // O(1)
     }
 
     public int diputadosEnDisputa(int idDistrito) {
-        throw new UnsupportedOperationException("No implementada aun");
+        return distritos[idDistrito].cant_bancas; // O(1)
     }
 
     public String distritoDeMesa(int idMesa) {

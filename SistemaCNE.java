@@ -1,23 +1,36 @@
 package aed;
 
 public class SistemaCNE {
-    Partido[] partidos;
-    Distrito[] distritos;
-    int votos_totales;
-    ColaDePrioridad[] dHondt;
-    ColaDePrioridad ballotage;
+    private Partido[] partidos;
+    private Distrito[] distritos;
+    private int votos_totales;
+    private ColaDePrioridad[] dHondt;
+    private ColaDePrioridad ballotage;
 
-    public class Partido {
+    private class Partido {
         private int votos_totales;
         private String nombre;
+
+        Partido() {
+            votos_totales = 0;
+            nombre = "";
+        }
     }
 
-    public class Distrito {
+    private class Distrito {
         private int cant_bancas;
         private int max;
         private int min;
         private String nombre;
-        private int[] votos_partidos;
+        private int[] votos_partido;
+
+        Distrito() {
+            cant_bancas = 0;
+            max = 0;
+            min = 0;
+            nombre = "";
+            votos_partido = null;
+        }
     }
 
     public class VotosPartido {
@@ -40,34 +53,32 @@ public class SistemaCNE {
 
     public SistemaCNE(String[] nombresDistritos, int[] diputadosPorDistrito, String[] nombresPartidos,
             int[] ultimasMesasDistritos) {
-        partidos = new Partido[nombresPartidos.length];
+        // generamos el array de distritos, complejidad O(d)
+        int i = 0;
         distritos = new Distrito[nombresDistritos.length];
-        dHondt = new ColaDePrioridad[nombresDistritos.length];
-        ballotage = new ColaDePrioridad(nombresPartidos.length);
-        votos_totales = 0;
-
-        for (int dist = 0; dist < distritos.length; dist++) {
-            Distrito distrito = new Distrito();
-            distrito.cant_bancas = diputadosPorDistrito[dist];
-            distrito.nombre = nombresDistritos[dist];
-            distrito.max = ultimasMesasDistritos[dist];
-            distrito.min = (dist == 0) ? 0 : (distritos[dist - 1].max + 1);
-            distrito.votos_partidos = new int[nombresDistritos.length];
-            for (int part = 0; part < nombresPartidos.length; part++) {
-                distrito.votos_partidos[part] = 0;
+        while (i < nombresDistritos.length) {
+            distritos[i] = new Distrito(); // generamos el distrito con valores predeterminados
+            // asignamos valores
+            distritos[i].nombre = nombresDistritos[i];
+            distritos[i].max = ultimasMesasDistritos[i];
+            if (i == 0) {
+                distritos[i].min = 0;
+            } else {
+                distritos[i].min = distritos[i - 1].max + 1;
             }
-            distritos[dist] = distrito;
-
-            dHondt[dist] = new ColaDePrioridad(nombresPartidos.length);
+            distritos[i].cant_bancas = diputadosPorDistrito[i];
+            distritos[i].votos_partido = new int[nombresPartidos.length]; // tomo en cuenta los votos en blanco
+            i++;
         }
-
-        for (int part = 0; part < partidos.length; part++) {
-            Partido partido = new Partido();
-            partido.nombre = nombresPartidos[part];
-            partido.votos_totales = 0;
-            partidos[part] = partido;
+        // generamos el array de distritos, complejidad O(p)
+        i = 0; // reiniciamos i
+        partidos = new Partido[nombresPartidos.length];
+        while (i < nombresPartidos.length) {
+            partidos[i] = new Partido(); // generamos el partido con nombres predeterminados
+            // asignamos valores
+            partidos[i].nombre = nombresPartidos[i];
+            i++;
         }
-
     }
 
     public String nombrePartido(int idPartido) {

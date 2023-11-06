@@ -60,7 +60,7 @@ public class SistemaCNE {
             distritos[i] = new Distrito(); // generamos el distrito con valores predeterminados
             // asignamos valores
             distritos[i].nombre = nombresDistritos[i];
-            distritos[i].max = ultimasMesasDistritos[i];
+            distritos[i].max = ultimasMesasDistritos[i] - 1;
             if (i == 0) {
                 distritos[i].min = 0;
             } else {
@@ -94,7 +94,21 @@ public class SistemaCNE {
     }
 
     public String distritoDeMesa(int idMesa) {
-        throw new UnsupportedOperationException("No implementada aun");
+        // usamos una busqueda binaria sobre el array de distritos, podemos hacer esto
+        // ya que el rango de bancas esta ordenado
+
+        int low = 0;
+        int high = distritos.length - 1;
+        // casos no triviales
+        while (low + 1 < high && (distritos[low].min > idMesa || distritos[low].max < idMesa)) {
+            int mid = (low + high) / 2;
+            if (distritos[mid].max < idMesa || (distritos[mid].min <= idMesa && distritos[mid].max >= idMesa)) {
+                low = mid;
+            } else {
+                high = mid;
+            }
+        }
+        return distritos[low].nombre;
     }
 
     public void registrarMesa(int idMesa, VotosPartido[] actaMesa) {

@@ -3,16 +3,17 @@ package aed;
 public class SistemaCNE {
     private Partido[] partidos;
     private Distrito[] distritos;
-    private int votos_totales;
     private ColaDePrioridad[] dHondt;
     private ColaDePrioridad ballotage;
 
     private class Partido {
-        private int votos_totales;
+        private int votos__totales_presidente;
+        private int votos__totales_diputados;
         private String nombre;
 
         Partido() {
-            votos_totales = 0;
+            votos__totales_presidente = 0;
+            votos__totales_diputados = 0;
             nombre = "";
         }
     }
@@ -22,14 +23,16 @@ public class SistemaCNE {
         private int max;
         private int min;
         private String nombre;
-        private int[] votos_partido;
+        private int[] votos_partido_pres;
+        private int[] votos_partido_dip;
 
         Distrito() {
             cant_bancas = 0;
             max = 0;
             min = 0;
             nombre = "";
-            votos_partido = null;
+            votos_partido_pres = null;
+            votos_partido_dip = null;
         }
     }
 
@@ -67,7 +70,8 @@ public class SistemaCNE {
                 distritos[i].min = distritos[i - 1].max + 1;
             }
             distritos[i].cant_bancas = diputadosPorDistrito[i];
-            distritos[i].votos_partido = new int[nombresPartidos.length]; // tomo en cuenta los votos en blanco
+            distritos[i].votos_partido_pres = new int[nombresPartidos.length]; // tomo en cuenta los votos en blanco
+            distritos[i].votos_partido_dip = new int[nombresPartidos.length]; // tomo en cuenta los votos en blanco
             i++;
         }
         // generamos el array de distritos, complejidad O(p)
@@ -96,38 +100,32 @@ public class SistemaCNE {
     public String distritoDeMesa(int idMesa) {
         // usamos una busqueda binaria sobre el array de distritos, podemos hacer esto
         // ya que el rango de bancas esta ordenado
-        int low = 0;
-        int high = distritos.length - 1;
-        // casos triviales
-        if (distritos[low].min <= idMesa && distritos[low].max >= idMesa) {
-            return distritos[low].nombre; // caso mesa perteneciente al primer distrito del arreglo
-        }
-        if (distritos[high].min <= idMesa && distritos[high].max >= idMesa) {
-            return distritos[high].nombre; // caso mesa perteneciente al ultimo distrito del arreglo
-        } else {
-            // casos no triviales
-            while (low + 1 < high && (distritos[low].min > idMesa || distritos[low].max < idMesa)) {
-                int mid = (low + high) / 2;
-                if (distritos[mid].max < idMesa || (distritos[mid].min <= idMesa && distritos[mid].max >= idMesa)) {
-                    low = mid;
-                } else {
-                    high = mid;
-                }
-            }
-            return distritos[low].nombre;
-        }
+        String res = busquedaBinariaDistrito(idMesa).nombre;
+        return res;
     }
 
     public void registrarMesa(int idMesa, VotosPartido[] actaMesa) {
-        throw new UnsupportedOperationException("No implementada aun");
+        // complejidad O(log(d))
+        Distrito distrito = busquedaBinariaDistrito(idMesa);
+        int i = 0;
+        // complejidad O(p)
+        while (i < distrito.votos_partido_pres.length) {
+            distrito.votos_partido_pres[i] += actaMesa[i].presidente;
+            distrito.votos_partido_dip[i] += actaMesa[i].diputados;
+            // vamos actualizando los votos totales para cada partido
+            partidos[i].votos__totales_presidente += actaMesa[i].presidente;
+            partidos[i].votos__totales_diputados += actaMesa[i].diputados;
+            i++;
+        }
+        // total complejidad O(P + log(d)) ? revisar
     }
 
     public int votosPresidenciales(int idPartido) {
-        throw new UnsupportedOperationException("No implementada aun");
+        return partidos[idPartido].votos__totales_presidente;
     }
 
     public int votosDiputados(int idPartido, int idDistrito) {
-        throw new UnsupportedOperationException("No implementada aun");
+        return distritos[idDistrito].votos_partido_dip[idPartido];
     }
 
     public int[] resultadosDiputados(int idDistrito) {
@@ -136,5 +134,28 @@ public class SistemaCNE {
 
     public boolean hayBallotage() {
         throw new UnsupportedOperationException("No implementada aun");
+    }
+
+    private Distrito busquedaBinariaDistrito(int idMesa) {
+        int low = 0;
+        int high = distritos.length - 1;
+        // casos triviales
+        if (distritos[low].min <= idMesa && distritos[low].max >= idMesa) {
+            return distritos[low]; // caso mesa perteneciente al primer distrito del arreglo
+        }
+        if (distritos[high].min <= idMesa && distritos[high].max >= idMesa) {
+            return distritos[high]; // caso mesa perteneciente al ultimo distrito del arreglo
+        } else {
+            // casos no triviales
+            while (low + 1 < high && (distritos[low].min > idMesa || distritos[low].max < idMesa)) {
+                int mid = low + (high - low) / 2;
+                if (distritos[mid].max < idMesa || (distritos[mid].min <= idMesa && distritos[mid].max >= idMesa)) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+            }
+            return distritos[low];
+        }
     }
 }

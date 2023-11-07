@@ -14,14 +14,14 @@ public class ColaDePrioridad<T extends Comparable<T>> { // Max Heap.
         cola.print();
     }
 
-    public ColaDePrioridad(int longitud) { // O(1)
-        T[] elems = (T[]) new Comparable[longitud];
+    public ColaDePrioridad(int longitud) { // O(n)
+        T[] elems = (T[]) new Comparable[longitud]; // O(n)
         this.longitud = longitud;
     }
 
     public ColaDePrioridad(T[] arreglo) { // O(n)
         longitud = arreglo.length;
-        T[] arr = (T[]) new Comparable[longitud];
+        T[] arr = (T[]) new Comparable[longitud]; // O(n)
         for (int i = 0; i < longitud; i++) { // O(n)
             arr[i] = arreglo[i];
         }

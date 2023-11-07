@@ -1,12 +1,12 @@
 package aed;
 
-public class ColaDePrioridad<T> { // Max Heap.
-    T[] elems; // Para complejidades n = longitud. Se toma el peor caso.
+public class ColaDePrioridad<T extends Comparable<T>> { // Max Heap.
+    T[] elems; // Para complejidades: n = longitud. Se toma el peor caso.
     int longitud; // Si no se aclara se asume que es O(1).
 
     public static void main(String[] args) {
-        int[] arr = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53, 92, 10, -20 };
-        ColaDePrioridad cola = new ColaDePrioridad(arr);
+        Integer[] arr = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53, 92, 10, -20 };
+        ColaDePrioridad<Integer> cola = new ColaDePrioridad<Integer>(arr);
         cola.print();
         int max = cola.desencolar();
         cola.print();
@@ -15,25 +15,29 @@ public class ColaDePrioridad<T> { // Max Heap.
     }
 
     public ColaDePrioridad(int longitud) { // O(1)
-        elems = new T[longitud];
+        T[] elems = (T[]) new Comparable[longitud];
         this.longitud = longitud;
     }
 
     public ColaDePrioridad(T[] arreglo) { // O(n)
         longitud = arreglo.length;
-        // elems = new int[arreglo.length];
-        for (int i = arreglo.length - 1; i >= 0; i--) { // O(n) por lo visto en clase del algoritmo de Floyd
-            heapify(arreglo, i, longitud); // O(log(n) - altura(i))
+        T[] arr = (T[]) new Comparable[longitud];
+        for (int i = 0; i < longitud; i++) { // O(n)
+            arr[i] = arreglo[i];
+        }
+        for (int i = longitud - 1; i >= 0; i--) { // O(n) por lo visto en clase del algoritmo de Floyd
+            heapify(arr, i, longitud); // O(log(n) - altura(i))
         }
         elems = arreglo;
     }
 
     // requiere que longitud > 0
-    public int desencolar() { // O(log n)
+    public T desencolar() { // O(log n)
         T maximo = elems[0];
         T ultimo = elems[longitud - 1];
         elems[0] = ultimo;
-        elems[longitud - 1] = -1;
+        // elems[longitud - 1] = -1; // si se reduce la longitud no hace falta
+        // reemplazar el elemento
         longitud--;
         heapify(elems, 0, longitud); // O(log n)
 

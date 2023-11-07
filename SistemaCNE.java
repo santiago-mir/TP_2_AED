@@ -4,12 +4,26 @@ public class SistemaCNE {
     Partido[] partidos;
     Distrito[] distritos;
     int votos_totales;
-    ColaDePrioridad[] dHondt;
-    ColaDePrioridad ballotage;
+    ColaDePrioridad<Partido>[] dHondt;
+    ColaDePrioridad<Partido> ballotage;
 
-    public class Partido {
-        private int votos_totales;
+    public class Partido implements Comparable<Partido> {
+        private int votos;
+        // private int[] votos_distritos;
         private String nombre;
+        private int id;
+
+        public int compareTo(Partido otro) {
+
+            // boolean oen = (otro == null); // otro es null
+
+            // boolean cd = otro.getClass() != this.getClass(); // clase es distinta
+            // if (oen || cd) {
+            // return -1;
+            // }
+            // Partido otroPartido = (Partido) otro;
+            return this.votos - otro.votos;
+        }
     }
 
     public class Distrito {
@@ -40,11 +54,11 @@ public class SistemaCNE {
 
     public SistemaCNE(String[] nombresDistritos, int[] diputadosPorDistrito, String[] nombresPartidos,
             int[] ultimasMesasDistritos) {
-        partidos = new Partido[nombresPartidos.length];
-        distritos = new Distrito[nombresDistritos.length];
-        dHondt = new ColaDePrioridad[nombresDistritos.length];
-        ballotage = new ColaDePrioridad(nombresPartidos.length);
-        votos_totales = 0;
+        Partido[] partidos = new Partido[nombresPartidos.length]; // O(P)
+        Distrito[] distritos = new Distrito[nombresDistritos.length]; // O(D)
+        ColaDePrioridad<Partido>[] dHondt = new ColaDePrioridad[nombresDistritos.length]; // O(D)
+        ColaDePrioridad<Partido> ballotage = new ColaDePrioridad<Partido>(nombresPartidos.length); // O(P)
+        int votos_totales = 0;
 
         for (int dist = 0; dist < distritos.length; dist++) {
             Distrito distrito = new Distrito();
@@ -58,13 +72,13 @@ public class SistemaCNE {
             }
             distritos[dist] = distrito;
 
-            dHondt[dist] = new ColaDePrioridad(nombresPartidos.length);
+            dHondt[dist] = new ColaDePrioridad<Partido>(nombresPartidos.length);
         }
 
         for (int part = 0; part < partidos.length; part++) {
             Partido partido = new Partido();
             partido.nombre = nombresPartidos[part];
-            partido.votos_totales = 0;
+            partido.votos = 0;
             partidos[part] = partido;
         }
 
@@ -99,7 +113,16 @@ public class SistemaCNE {
     }
 
     public int[] resultadosDiputados(int idDistrito) {
-        throw new UnsupportedOperationException("No implementada aun");
+        ColaDePrioridad<Partido> votos = dHondt[idDistrito];
+        int[] res = new int[distritos[idDistrito].votos_partidos.length];
+        for (int i = 0; i < distritos[idDistrito].cant_bancas; i++) {
+            Partido banca = votos.desencolar();
+            res[banca.id] += 1;
+            banca.votos = banca.votos / (res[banca.id] + 1);
+            votos.encolar(banca);
+        }
+
+        return res;
     }
 
     public boolean hayBallotage() {

@@ -63,6 +63,15 @@ public class ColaDePrioridad<T extends Comparable<T>> { // Max Heap.
 
     // requiere que longitud < elems.length
     public void encolar(T e) { // O(log n)
+        if (longitud == elems.length) { // O(n), pero solo pasa cada por lo menos n inserciones, amortizado es O(1).
+                                        // Igualmente no vamos a utilizarlo en el tp, pero quería escribirlo para que
+                                        // quede completo
+            T[] new_elems = (T[]) new Comparable[longitud * 2];
+            for (int k = 0; k < longitud; k++) { // O(n)
+                new_elems[k] = elems[k];
+            }
+            elems = new_elems;
+        }
         int i = longitud;
         elems[longitud] = e;
         longitud++;

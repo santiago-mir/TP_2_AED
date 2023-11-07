@@ -32,6 +32,7 @@ public class SistemaCNE {
         private int min;
         private String nombre;
         private int[] votos_partidos;
+        private int votos_totales;
     }
 
     public class VotosPartido {
@@ -60,25 +61,27 @@ public class SistemaCNE {
         ColaDePrioridad<Partido> ballotage = new ColaDePrioridad<Partido>(nombresPartidos.length); // O(P)
         int votos_totales = 0;
 
-        for (int dist = 0; dist < distritos.length; dist++) {
+        for (int dist = 0; dist < distritos.length; dist++) { // O(D*P)
             Distrito distrito = new Distrito();
             distrito.cant_bancas = diputadosPorDistrito[dist];
             distrito.nombre = nombresDistritos[dist];
             distrito.max = ultimasMesasDistritos[dist];
             distrito.min = (dist == 0) ? 0 : (distritos[dist - 1].max + 1);
             distrito.votos_partidos = new int[nombresDistritos.length];
-            for (int part = 0; part < nombresPartidos.length; part++) {
+            for (int part = 0; part < nombresPartidos.length; part++) { // O(P)
                 distrito.votos_partidos[part] = 0;
             }
+            distritos.votos_totales = 0;
             distritos[dist] = distrito;
 
-            dHondt[dist] = new ColaDePrioridad<Partido>(nombresPartidos.length);
+            dHondt[dist] = new ColaDePrioridad<Partido>(nombresPartidos.length); // O(P)
         }
 
-        for (int part = 0; part < partidos.length; part++) {
+        for (int part = 0; part < partidos.length; part++) { // O(P)
             Partido partido = new Partido();
             partido.nombre = nombresPartidos[part];
             partido.votos = 0;
+            partido.id = part;
             partidos[part] = partido;
         }
 
@@ -112,14 +115,14 @@ public class SistemaCNE {
         throw new UnsupportedOperationException("No implementada aun");
     }
 
-    public int[] resultadosDiputados(int idDistrito) {
+    public int[] resultadosDiputados(int idDistrito) { // O(Dd*log(P)) ???
         ColaDePrioridad<Partido> votos = dHondt[idDistrito];
-        int[] res = new int[distritos[idDistrito].votos_partidos.length];
-        for (int i = 0; i < distritos[idDistrito].cant_bancas; i++) {
-            Partido banca = votos.desencolar();
+        int[] res = new int[distritos[idDistrito].votos_partidos.length]; // O(P) ???
+        for (int i = 0; i < distritos[idDistrito].cant_bancas; i++) { // O(Dd*log(P))
+            Partido banca = votos.desencolar(); // O(log(P))
             res[banca.id] += 1;
             banca.votos = banca.votos / (res[banca.id] + 1);
-            votos.encolar(banca);
+            votos.encolar(banca); // O(log(P))
         }
 
         return res;

@@ -8,12 +8,10 @@ public class SistemaCNE {
 
     private class Partido {
         private int votos__totales_presidente;
-        private int votos__totales_diputados;
         private String nombre;
 
         Partido() {
             votos__totales_presidente = 0;
-            votos__totales_diputados = 0;
             nombre = "";
         }
     }
@@ -23,7 +21,6 @@ public class SistemaCNE {
         private int max;
         private int min;
         private String nombre;
-        private int[] votos_partido_pres;
         private int[] votos_partido_dip;
 
         Distrito() {
@@ -31,7 +28,6 @@ public class SistemaCNE {
             max = 0;
             min = 0;
             nombre = "";
-            votos_partido_pres = null;
             votos_partido_dip = null;
         }
     }
@@ -70,7 +66,6 @@ public class SistemaCNE {
                 distritos[i].min = distritos[i - 1].max + 1;
             }
             distritos[i].cant_bancas = diputadosPorDistrito[i];
-            distritos[i].votos_partido_pres = new int[nombresPartidos.length]; // tomo en cuenta los votos en blanco
             distritos[i].votos_partido_dip = new int[nombresPartidos.length]; // tomo en cuenta los votos en blanco
             i++;
         }
@@ -109,12 +104,10 @@ public class SistemaCNE {
         Distrito distrito = busquedaBinariaDistrito(idMesa);
         int i = 0;
         // complejidad O(p)
-        while (i < distrito.votos_partido_pres.length) {
-            distrito.votos_partido_pres[i] += actaMesa[i].presidente;
+        while (i < partidos.length) {
             distrito.votos_partido_dip[i] += actaMesa[i].diputados;
             // vamos actualizando los votos totales para cada partido
             partidos[i].votos__totales_presidente += actaMesa[i].presidente;
-            partidos[i].votos__totales_diputados += actaMesa[i].diputados;
             i++;
         }
         // total complejidad O(P + log(d)) ? revisar

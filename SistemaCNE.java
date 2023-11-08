@@ -33,6 +33,7 @@ public class SistemaCNE {
         private String nombre;
         private int[] votos_partidos;
         private int votos_totales;
+        private int[] resultado_dHondt;
     }
 
     public class VotosPartido {
@@ -68,9 +69,11 @@ public class SistemaCNE {
             distrito.nombre = nombresDistritos[dist];
             distrito.max = ultimasMesasDistritos[dist];
             distrito.min = (dist == 0) ? 0 : (distritos[dist - 1].max + 1);
-            distrito.votos_partidos = new int[nombresDistritos.length];
-            for (int part = 0; part < nombresPartidos.length; part++) { // O(P)
-                distrito.votos_partidos[part] = 0;
+            distrito.votos_partidos = new int[nombresPartidos.length]; // O(P)
+            distrito.resultado_dHondt = new int[nombresPartidos.length]; // O(P)
+            for (int part = 0; part < nombresPartidos.length; part++) { // O(P).
+                distrito.votos_partidos[part] = 0; // En java no es necesario, se inicializan en 0,
+                distrito.resultado_dHondt[part] = 0; // pero para hacerlo más declarativo
             }
             distrito.votos_totales = 0;
             distritos[dist] = distrito;
@@ -116,9 +119,10 @@ public class SistemaCNE {
         throw new UnsupportedOperationException("No implementada aun");
     }
 
-    public int[] resultadosDiputados(int idDistrito) { // O(Dd*log(P)) ???
+    public int[] resultadosDiputados(int idDistrito) { // O(Dd*log(P))
         ColaDePrioridad<Partido> votos = dHondt[idDistrito];
-        int[] res = new int[distritos[idDistrito].votos_partidos.length]; // O(P) ???
+        int[] res = distritos[idDistrito].resultado_dHondt;
+        // int[] res = new int[distritos[idDistrito].votos_partidos.length]; // O(P) ???
         for (int i = 0; i < distritos[idDistrito].cant_bancas; i++) { // O(Dd*log(P)) porque se realiza Dd veces un
                                                                       // bloque de código O(log(P))
             Partido banca = votos.desencolar(); // O(log(P))
@@ -126,7 +130,6 @@ public class SistemaCNE {
             banca.votos = banca.votos / (res[banca.id] + 1);
             votos.encolar(banca); // O(log(P))
         }
-
         return res;
     }
 

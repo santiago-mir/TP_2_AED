@@ -133,16 +133,18 @@ public class SistemaCNE {
         return res;
     }
 
-    public int porcentajes(int votos_partidos){
-        return (ballotage.elems[votos_partidos] * 100)/votos_totales;
+    public int porcentajes(int votos_partidos) {
+        return (ballotage.elems[votos_partidos] * 100) / votos_totales;
     }
 
     public boolean hayBallotage() {
-        boolean res = false;
-        if (porcentajes(ballotage.elems[0]) > 45){
-            res = true;
-        } else if (porcentajes(ballotage.elems[0]) > 40 && porcentajes(ballotage.elems[0]) - porcentajes(ballotage.elems[1]) >= 10 && porcentajes(ballotage.elems[0]) - porcentajes(ballotage.elems[2]) >= 10){
-            res = true;
+        boolean res = true;
+        Partido primero = ballotage.proximo();
+        if (porcentajes(primero) >= 45) {
+            res = false;
+        } else if (porcentajes(primero) >= 40
+                && porcentajes(primero) - porcentajes(ballotage.segundo()) >= 10) {
+            res = false;
         }
         return res;
     }

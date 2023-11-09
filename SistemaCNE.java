@@ -116,7 +116,7 @@ public class SistemaCNE {
     }
 
     public int votosDiputados(int idPartido, int idDistrito) {
-        throw new UnsupportedOperationException("No implementada aun");
+        return distritos[idDistrito].votos_partidos[idPartido];
     }
 
     public int[] resultadosDiputados(int idDistrito) { // O(Dd*log(P))
@@ -133,7 +133,17 @@ public class SistemaCNE {
         return res;
     }
 
+    public int porcentajes(int votos_partidos){
+        return (ballotage.elems[votos_partidos] * 100)/votos_totales;
+    }
+
     public boolean hayBallotage() {
-        throw new UnsupportedOperationException("No implementada aun");
+        boolean res = false;
+        if (porcentajes(ballotage.elems[0]) > 45){
+            res = true;
+        } else if (porcentajes(ballotage.elems[0]) > 40 && porcentajes(ballotage.elems[0]) - porcentajes(ballotage.elems[1]) >= 10 && porcentajes(ballotage.elems[0]) - porcentajes(ballotage.elems[2]) >= 10){
+            res = true;
+        }
+        return res;
     }
 }

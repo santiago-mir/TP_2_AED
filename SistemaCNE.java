@@ -112,7 +112,7 @@ public class SistemaCNE {
     }
 
     public int votosPresidenciales(int idPartido) {
-        throw new UnsupportedOperationException("No implementada aun");
+        return partidos[idPartido].votos;
     }
 
     public int votosDiputados(int idPartido, int idDistrito) {

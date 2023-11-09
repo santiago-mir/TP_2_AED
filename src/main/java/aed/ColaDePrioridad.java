@@ -1,53 +1,58 @@
 package aed;
 
-public class ColaDePrioridad { // Max Heap.
-    int[] elems; // Para complejidades n = longitud. Se toma el peor caso.
+public class ColaDePrioridad<T extends Comparable<T>> { // Max Heap.
+    T[] elems; // Para complejidades: n = longitud. Se toma el peor caso.
     int longitud; // Si no se aclara se asume que es O(1).
 
-    public static void main(String[] args) {
-        int[] arr = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53, 92, 10, -20 };
-        ColaDePrioridad cola = new ColaDePrioridad(arr);
-        cola.print();
-        int max = cola.desencolar();
-        cola.print();
-        cola.encolar(max);
-        cola.print();
-    }
+    // public static void main(String[] args) {
+    // Integer[] arr = { 5, 2, 3, 1, 8, 2, 4, 10, 2, 7, 42, 73, 71, 13, 23, 53, 92,
+    // 10, -20 };
+    // ColaDePrioridad<Integer> cola = new ColaDePrioridad<Integer>(arr);
+    // cola.print();
+    // int max = cola.desencolar();
+    // cola.print();
+    // cola.encolar(max);
+    // cola.print();
+    // }
 
-    public ColaDePrioridad(int longitud) { // O(1)
-        elems = new int[longitud];
+    public ColaDePrioridad(int longitud) { // O(n)
+        T[] elems = (T[]) new Comparable[longitud]; // O(n)
         this.longitud = longitud;
     }
 
-    public ColaDePrioridad(int[] arreglo) { // O(n)
+    public ColaDePrioridad(T[] arreglo) { // O(n)
         longitud = arreglo.length;
-        // elems = new int[arreglo.length];
-        for (int i = arreglo.length - 1; i >= 0; i--) { // O(n) por lo visto en clase del algoritmo de Floyd
-            heapify(arreglo, i, longitud); // O(log(n) - altura(i))
+        T[] arr = (T[]) new Comparable[longitud]; // O(n)
+        for (int i = 0; i < longitud; i++) { // O(n)
+            arr[i] = arreglo[i];
+        }
+        for (int i = longitud - 1; i >= 0; i--) { // O(n) por lo visto en clase del algoritmo de Floyd
+            heapify(arr, i, longitud); // O(log(n) - altura(i))
         }
         elems = arreglo;
     }
 
     // requiere que longitud > 0
-    public int desencolar() { // O(log n)
-        int maximo = elems[0];
-        int ultimo = elems[longitud - 1];
+    public T desencolar() { // O(log n)
+        T maximo = elems[0];
+        T ultimo = elems[longitud - 1];
         elems[0] = ultimo;
-        elems[longitud - 1] = -1;
+        // elems[longitud - 1] = -1; // si se reduce la longitud no hace falta
+        // reemplazar el elemento
         longitud--;
         heapify(elems, 0, longitud); // O(log n)
 
         return maximo;
     }
 
-    public int proximo() { // O(1)
+    public T proximo() { // O(1)
         return elems[0];
     }
 
     // requiere longitud > 1
-    public int segundo() { // O(1)
+    public T segundo() { // O(1)
         if (longitud > 2) {
-            if (elems[1] > elems[2]) {
+            if (elems[1].compareTo(elems[2]) > 0) {
                 return elems[1];
             } else {
                 return elems[2];
@@ -58,11 +63,20 @@ public class ColaDePrioridad { // Max Heap.
     }
 
     // requiere que longitud < elems.length
-    public void encolar(int e) { // O(log n)
+    public void encolar(T e) { // O(log n)
+        if (longitud == elems.length) { // O(n), pero solo pasa cada por lo menos n inserciones, amortizado es O(1).
+                                        // Igualmente no vamos a utilizarlo en el tp, pero quería escribirlo para que
+                                        // quede completo
+            T[] new_elems = (T[]) new Comparable[longitud * 2];
+            for (int k = 0; k < longitud; k++) { // O(n)
+                new_elems[k] = elems[k];
+            }
+            elems = new_elems;
+        }
         int i = longitud;
         elems[longitud] = e;
         longitud++;
-        while (elems[i] > elems[(i - 1) / 2]) { // O(log n), cada vez se reduce a la mitad
+        while (elems[i].compareTo(elems[(i - 1) / 2]) > 0) { // O(log n), cada vez se reduce a la mitad
             elems[i] = elems[(i - 1) / 2];
             elems[(i - 1) / 2] = e;
             i = (i - 1) / 2;
@@ -107,7 +121,7 @@ public class ColaDePrioridad { // Max Heap.
     // decir
     // su cumplejidad es O(la altura del subárbol correspondiente a i) =
     // O(log(max_long) - nivel(i))
-    private void heapify(int[] arr, int i, int max_long) { // O(log(max_long) - nivel(i))
+    private void heapify(T[] arr, int i, int max_long) { // O(log(max_long) - nivel(i))
         int hijoIzq = i * 2 + 1;
         int hijoDer = i * 2 + 2;
         boolean tieneHijoIzq = hijoIzq < max_long;
@@ -115,14 +129,15 @@ public class ColaDePrioridad { // Max Heap.
         boolean tieneHijos = tieneHijoDer || tieneHijoIzq;
 
         if (tieneHijos) {
-            if ((tieneHijoIzq && arr[i] < arr[hijoIzq]) || (tieneHijoDer && arr[i] < arr[hijoDer])) {
+            if ((tieneHijoIzq && arr[i].compareTo(arr[hijoIzq]) < 0)
+                    || (tieneHijoDer && arr[i].compareTo(arr[hijoDer]) < 0)) {
                 int mayorHijo;
-                if (tieneHijoDer && arr[hijoDer] > arr[hijoIzq]) {
+                if (tieneHijoDer && arr[hijoDer].compareTo(arr[hijoIzq]) > 0) {
                     mayorHijo = hijoDer;
                 } else {
                     mayorHijo = hijoIzq;
                 }
-                int mayorHijoValor = arr[mayorHijo];
+                T mayorHijoValor = arr[mayorHijo];
                 arr[mayorHijo] = arr[i];
                 arr[i] = mayorHijoValor;
                 heapify(arr, mayorHijo, max_long); // O(log(max_long) - nivel(i) - 1). Cada vez se va reduciendo u

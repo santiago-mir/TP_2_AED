@@ -3,8 +3,6 @@ package aed;
 public class SistemaCNE {
     private Partido[] partidos;
     private Distrito[] distritos;
-    private ColaDePrioridad[] dHondt;
-    private ColaDePrioridad ballotage;
 
     private class Partido {
         private int votos__totales_presidente;
@@ -22,6 +20,7 @@ public class SistemaCNE {
         private int min;
         private String nombre;
         private int[] votos_partido_dip;
+        private ColaDePrioridad dHont;
 
         Distrito() {
             cant_bancas = 0;
@@ -29,6 +28,7 @@ public class SistemaCNE {
             min = 0;
             nombre = "";
             votos_partido_dip = null;
+            dHont = null;
         }
     }
 
@@ -110,6 +110,7 @@ public class SistemaCNE {
             partidos[i].votos__totales_presidente += actaMesa[i].presidente;
             i++;
         }
+        distrito.dHont = new ColaDePrioridad(distrito.votos_partido_dip);
         // total complejidad O(P + log(d)) ? revisar
     }
 

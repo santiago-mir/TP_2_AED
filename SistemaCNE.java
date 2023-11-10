@@ -55,12 +55,12 @@ public class SistemaCNE {
             distrito.max = ultimasMesasDistritos[dist] - 1; // no inclusivo
             distrito.min = (dist == 0) ? 0 : (distritos[dist - 1].max + 1);
             distrito.votos_partidos = new int[nombresPartidos.length]; // O(P)
-            // distrito.resultado_dHondt = new int[nombresPartidos.length - 1]; // O(P)
+            distrito.resultado_dHondt = new int[nombresPartidos.length - 1]; // O(P)
             distrito.votos_totales = 0;
+            distrito.dHondt_calculado = false;
             distritos[dist] = distrito;
 
-            // distrito.dHondt = new ColaDePrioridadPartido(nombresPartidos.length - 1); //
-            // O(P)
+            distrito.dHondt = new ColaDePrioridadPartido(nombresPartidos.length - 1); // O(P)
         }
 
         for (int part = 0; part < partidos.length; part++) { // O(P)

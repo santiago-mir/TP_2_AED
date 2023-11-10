@@ -4,39 +4,22 @@ public class SistemaCNE {
     Partido[] partidos;
     Distrito[] distritos;
     int votos_totales;
-    ColaDePrioridad<Partido> ballotage;
-
-    public class Partido implements Comparable<Partido> {
-        private int votos;
-        private String nombre;
-        private int id;
-
-        public int compareTo(Partido otro) {
-            return this.votos - otro.votos;
-        }
-
-        public Partido(int votos, String nombre, int id) {
-            this.votos = votos;
-            this.nombre = nombre;
-            this.id = id;
-        }
-
-        public Partido() {
-        }
-    }
+    ColaDePrioridadPartido ballotage;
 
     public class Distrito {
         // Constantes
+        private String nombre;
         private int cant_bancas;
         private int max;
         private int min;
-        private String nombre;
         // Variables
-        private int[] votos_partidos;
         private int votos_totales;
-        private ColaDePrioridad<Partido> dHondt;
+        private int[] votos_partidos;
+        // dHondt
         private boolean dHondt_calculado;
         private int[] resultado_dHondt;
+        private ColaDePrioridadPartido dHondt;
+
     }
 
     public class VotosPartido {
@@ -61,27 +44,23 @@ public class SistemaCNE {
             int[] ultimasMesasDistritos) { // O(D*P)
         this.partidos = new Partido[nombresPartidos.length]; // O(P)
         this.distritos = new Distrito[nombresDistritos.length]; // O(D)
-        // this.dHondt = new ColaDePrioridad[nombresDistritos.length]; // O(D)
-        this.ballotage = new ColaDePrioridad<Partido>(nombresPartidos.length); // O(P)
+        this.ballotage = new ColaDePrioridadPartido(nombresPartidos.length); // O(P)
         this.votos_totales = 0;
-        // O(D*P) porque se ejecuta D veces un bloque de código O(P)
-        for (int dist = 0; dist < distritos.length; dist++) { // O(D)
+
+        for (int dist = 0; dist < distritos.length; dist++) { // O(D*P) porque se ejecuta D veces un bloque de código
+                                                              // O(P)
             Distrito distrito = new Distrito();
             distrito.cant_bancas = diputadosPorDistrito[dist];
             distrito.nombre = nombresDistritos[dist];
-            distrito.max = ultimasMesasDistritos[dist];
+            distrito.max = ultimasMesasDistritos[dist] - 1; // no inclusivo
             distrito.min = (dist == 0) ? 0 : (distritos[dist - 1].max + 1);
             distrito.votos_partidos = new int[nombresPartidos.length]; // O(P)
-            // distrito.resultado_dHondt = new int[nombresPartidos.length]; // O(P)
-            // for (int part = 0; part < nombresPartidos.length; part++) { // O(P).
-            // distrito.votos_partidos[part] = 0; // En java no es necesario, se inicializan
-            // en 0,
-            // distrito.resultado_dHondt[part] = 0; // pero para hacerlo más declarativo
-            // }
+            // distrito.resultado_dHondt = new int[nombresPartidos.length - 1]; // O(P)
             distrito.votos_totales = 0;
             distritos[dist] = distrito;
 
-            // dHondt[dist] = new ColaDePrioridad<Partido>(nombresPartidos.length); // O(P)
+            // distrito.dHondt = new ColaDePrioridadPartido(nombresPartidos.length - 1); //
+            // O(P)
         }
 
         for (int part = 0; part < partidos.length; part++) { // O(P)
@@ -91,15 +70,14 @@ public class SistemaCNE {
             partido.id = part;
             partidos[part] = partido;
         }
-
     }
 
     public String nombrePartido(int idPartido) {
-        throw new UnsupportedOperationException("No implementada aun");
+        return partidos[idPartido].nombre;
     }
 
     public String nombreDistrito(int idDistrito) {
-        throw new UnsupportedOperationException("No implementada aun");
+        return distritos[idDistrito].nombre;
     }
 
     public int diputadosEnDisputa(int idDistrito) { // O(1)
@@ -107,14 +85,22 @@ public class SistemaCNE {
     }
 
     public String distritoDeMesa(int idMesa) {
-        throw new UnsupportedOperationException("No implementada aun");
+        int indice = busquedaBinaria(distritos, idMesa);
+        return distritos[indice].nombre;
     }
 
-    public void registrarMesa(int idMesa, VotosPartido[] actaMesa) {
-        Distrito distrito;
-        distrito = distritos[0]; // provisorio, sacar
+    public void registrarMesa(int idMesa, VotosPartido[] actaMesa) { // actaMesa.length = partidos.length
+        int indice = busquedaBinaria(distritos, idMesa);
+        Distrito distrito = distritos[indice];
+        for (int part = 0; part < actaMesa.length; part++) { // O(P)
+            distrito.votos_partidos[part] += actaMesa[part].votosDiputados();
+            distrito.votos_totales += actaMesa[part].votosDiputados();
+            partidos[part].votos += actaMesa[part].votosPresidente();
+            votos_totales += actaMesa[part].votosPresidente();
+        }
+        this.ballotage = new ColaDePrioridadPartido(partidos); // O(P)
 
-        // específico para Ej9 - resultadosDiputados.
+        // ej 9
         distrito.dHondt_calculado = false;
         distrito.resultado_dHondt = new int[partidos.length - 1]; // O(P)
         Partido[] umbral = new Partido[partidos.length - 1]; // O(P)
@@ -125,7 +111,7 @@ public class SistemaCNE {
                 umbral[i] = new Partido(0, partidos[i].nombre, i);
             }
         }
-        distrito.dHondt = new ColaDePrioridad<Partido>(umbral); // O(P)
+        distrito.dHondt = new ColaDePrioridadPartido(umbral); // O(P)
     }
 
     public int votosPresidenciales(int idPartido) {
@@ -133,14 +119,16 @@ public class SistemaCNE {
     }
 
     public int votosDiputados(int idPartido, int idDistrito) {
-        return distritos[idDistrito].votos_partidos[idPartido];
+        Distrito distrito = distritos[idDistrito];
+        int partido = distrito.votos_partidos[idPartido];
+        return partido;
     }
 
     public int[] resultadosDiputados(int idDistrito) { // O(Dd*log(P))
         Distrito distrito = distritos[idDistrito];
         int[] res = distrito.resultado_dHondt;
         if (!distrito.dHondt_calculado) {
-            ColaDePrioridad<Partido> votos = distrito.dHondt;
+            ColaDePrioridadPartido votos = distrito.dHondt;
             // O(Dd*log(P)) porque se realiza Dd veces un bloque de código O(log(P))
             for (int i = 0; i < distrito.cant_bancas; i++) { // O(Dd)
                 Partido banca = votos.desencolar(); // O(log(P))
@@ -151,14 +139,6 @@ public class SistemaCNE {
             distrito.dHondt_calculado = true;
         }
         return res;
-    }
-
-    public int porcentaje(Partido partido, int votos_totales) {
-        return (partido.votos * 100) / votos_totales;
-    }
-
-    public int porcentaje(int votos, int votos_totales) {
-        return (votos * 100) / votos_totales;
     }
 
     public boolean hayBallotage() {
@@ -172,4 +152,38 @@ public class SistemaCNE {
         }
         return res;
     }
+
+    // requiere una lista ordenada y que el elemento se encuentre en la lista.
+    private int busquedaBinaria(Distrito[] arr, int valor) { // O(log(|arr|))
+        int inicio = 0;
+        int fin = arr.length - 1;
+        if (arr.length == 0) {
+            return -1;
+        }
+        if (arr[inicio].max > valor) {
+            return inicio;
+        } else if (arr[fin].min <= valor) {
+            return fin;
+        } else {
+            while (inicio + 1 < fin) {
+                int medio = (inicio + fin) / 2;
+                if (arr[medio].min <= valor) {
+                    inicio = medio;
+                } else {
+                    fin = medio;
+                }
+            }
+            return inicio;
+        }
+    }
+
+    private int porcentaje(Partido partido, int total) {
+        float votos = partido.votos;
+        return (int) (votos * 100 / total);
+    }
+
+    private int porcentaje(int votos, int total) {
+        return (int) ((float) votos * 100 / total);
+    }
+
 }
